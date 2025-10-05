@@ -22,7 +22,6 @@ public class ConsultaRuaController {
                     .fromHttpUrl("http://viacep.com.br/ws")
                     .pathSegment(uf, localidade, logradouro, "json")
                     .build()
-                    .encode()
                     .toUriString();
 
             RestTemplate restTemplate = new RestTemplate();

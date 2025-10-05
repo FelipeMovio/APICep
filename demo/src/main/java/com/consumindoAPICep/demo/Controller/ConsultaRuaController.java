@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("consult-rua")
+@RequestMapping("/consult-rua")
 public class ConsultaRuaController {
 
     @GetMapping("{uf}/{localidade}/{logradouro}")

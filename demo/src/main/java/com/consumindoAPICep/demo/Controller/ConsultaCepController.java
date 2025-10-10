@@ -1,6 +1,8 @@
 package com.consumindoAPICep.demo.Controller;
 
 import com.consumindoAPICep.demo.Entity.Cep;
+import com.consumindoAPICep.demo.Service.CepService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -10,14 +12,11 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/consult-cep")
 public class ConsultaCepController {
 
+    @Autowired
+    private CepService cepService;
+
     @GetMapping("/{cep}")
-    public Cep consultaCep (@PathVariable("cep") String cep){
-        RestTemplate restTemplate = new RestTemplate(); // Criação do bjeto para trabalhar com restTemplate
-        ResponseEntity<Cep> resp =
-                restTemplate
-                        .getForEntity(
-                                String.format("http://viacep.com.br/ws/%s/json", cep),
-                                Cep.class);
-        return resp.getBody();
+    public Cep consultCep (@PathVariable("cep") String cep) {
+        return cepService.consultaInformPorCep(cep);
     }
 }

@@ -26,9 +26,14 @@ public class CepService {
                 .toUriString();
 
         RestTemplate restTemplate = new RestTemplate();
+        // RestTemplate é uma classe do Spring usada para fazer requisições HTTP.
+
         ResponseEntity<Cep[]> response = restTemplate.getForEntity(url, Cep[].class);
+        //getForEntity() chama a API e espera uma resposta em formato de array de Cep.
+
 
         List<Cep> resultados = Arrays.asList(response.getBody());
+        // convertendo o array em lista e mostrando no corpo
 
         // Salvar os resultados no banco se ainda não estiverem salvos
         for (Cep dto : resultados) {
@@ -43,6 +48,16 @@ public class CepService {
                 cep.setDdd(dto.getDdd());
 
                 cepRepository.save(cep);
+
+//                Percorre todos os resultados retornados pela API.
+//
+//                        Para cada resultado:
+//
+//                Verifica se o CEP já existe no banco.
+//
+//                Se não existe, cria um objeto Cep e copia os dados do CepResultDTO.
+//
+//                        Usa o cepRepository.save() para salvar no banco H2.
             }
         }
 
@@ -50,6 +65,11 @@ public class CepService {
     }
 
     public Cep consultaInformPorCep(String cep){
-        String url =
+        RestTemplate restTemplate = new RestTemplate();
+
+        String url = String.format("http://viacep.com.br/ws/%s/json", cep);
+        ResponseEntity<Cep> response = restTemplate.getForEntity(url, Cep.class);
+
+        return response.getBody();
     }
 }

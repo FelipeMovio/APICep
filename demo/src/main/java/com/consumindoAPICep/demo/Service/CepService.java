@@ -3,6 +3,7 @@ package com.consumindoAPICep.demo.Service;
 import com.consumindoAPICep.demo.Entity.Cep;
 import com.consumindoAPICep.demo.repository.CepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +19,7 @@ public class CepService {
     @Autowired
     private CepRepository cepRepository;
 
+    @Cacheable(value = "buscaPorRua", key = "#uf + '-' + #localidade + '-' + #logradouro")
     public List<Cep> buscarCepPorRua(String uf, String localidade, String logradouro) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("http://viacep.com.br/ws")
@@ -64,7 +66,10 @@ public class CepService {
         return resultados;
     }
 
+    @Cacheable(value = "ceps" , key = "#cep")
     public Cep consultaInformPorCep(String cep){
+        System.out.println("🔍 Consultando API externa para o CEP: " + cep);
+
         RestTemplate restTemplate = new RestTemplate();
 
         String url = String.format("http://viacep.com.br/ws/%s/json", cep);

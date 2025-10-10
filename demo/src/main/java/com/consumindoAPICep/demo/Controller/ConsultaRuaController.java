@@ -1,7 +1,7 @@
 package com.consumindoAPICep.demo.Controller;
 
 import com.consumindoAPICep.demo.Entity.Cep;
-import com.consumindoAPICep.demo.service.CepService;
+import com.consumindoAPICep.demo.Service.CepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -18,6 +18,6 @@ public class ConsultaRuaController {
     public List<Cep> consultaRua(@PathVariable String uf,
                                  @PathVariable String localidade,
                                  @PathVariable String logradouro) {
-        return cepService.buscarCep(uf, localidade, logradouro);
+        return cepService.buscarCepPorRua(uf, localidade, logradouro);
     }
 }

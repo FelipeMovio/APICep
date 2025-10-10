@@ -1,4 +1,4 @@
-package com.consumindoAPICep.demo.service;
+package com.consumindoAPICep.demo.Service;
 
 import com.consumindoAPICep.demo.Entity.Cep;
 import com.consumindoAPICep.demo.repository.CepRepository;
@@ -18,7 +18,7 @@ public class CepService {
     @Autowired
     private CepRepository cepRepository;
 
-    public List<Cep> buscarCep(String uf, String localidade, String logradouro) {
+    public List<Cep> buscarCepPorRua(String uf, String localidade, String logradouro) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("http://viacep.com.br/ws")
                 .pathSegment(uf, localidade, logradouro, "json")
@@ -47,5 +47,9 @@ public class CepService {
         }
 
         return resultados;
+    }
+
+    public Cep consultaInformPorCep(String cep){
+        String url =
     }
 }

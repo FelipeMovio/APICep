@@ -1,6 +1,6 @@
 package com.consumindoAPICep.demo.Controller;
 
-import com.consumindoAPICep.demo.Entity.CepResultDTO;
+import com.consumindoAPICep.demo.Entity.Cep;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -11,13 +11,13 @@ import org.springframework.web.client.RestTemplate;
 public class ConsultaCepController {
 
     @GetMapping("/{cep}")
-    public CepResultDTO consultaCep (@PathVariable("cep") String cep){
+    public Cep consultaCep (@PathVariable("cep") String cep){
         RestTemplate restTemplate = new RestTemplate(); // Criação do bjeto para trabalhar com restTemplate
-        ResponseEntity<CepResultDTO> resp =
+        ResponseEntity<Cep> resp =
                 restTemplate
                         .getForEntity(
                                 String.format("http://viacep.com.br/ws/%s/json", cep),
-                                CepResultDTO.class);
+                                Cep.class);
         return resp.getBody();
     }
 }

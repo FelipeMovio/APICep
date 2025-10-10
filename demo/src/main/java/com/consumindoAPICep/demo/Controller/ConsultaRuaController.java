@@ -1,12 +1,9 @@
 package com.consumindoAPICep.demo.Controller;
 
-import com.consumindoAPICep.demo.Entity.CepResultDTO;
-import org.springframework.http.ResponseEntity;
+import com.consumindoAPICep.demo.Entity.Cep;
+import com.consumindoAPICep.demo.service.CepService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Arrays;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -14,23 +11,13 @@ import java.util.List;
 @RequestMapping("/consult-rua")
 public class ConsultaRuaController {
 
+    @Autowired
+    private CepService cepService;
+
     @GetMapping("/{uf}/{localidade}/{logradouro}")
-    public List<CepResultDTO> consultaRua(@PathVariable String uf,
-                                          @PathVariable String localidade,
-                                          @PathVariable String logradouro) {
-        try {
-            String url = UriComponentsBuilder
-                    .fromHttpUrl("http://viacep.com.br/ws")
-                    .pathSegment(uf, localidade, logradouro, "json")
-                    .build()
-                    .toUriString();
-
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<CepResultDTO[]> resp = restTemplate.getForEntity(url, CepResultDTO[].class);
-
-            return Arrays.asList(resp.getBody());
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao consultar API ViaCEP: " + e.getMessage());
-        }
+    public List<Cep> consultaRua(@PathVariable String uf,
+                                 @PathVariable String localidade,
+                                 @PathVariable String logradouro) {
+        return cepService.buscarCep(uf, localidade, logradouro);
     }
 }

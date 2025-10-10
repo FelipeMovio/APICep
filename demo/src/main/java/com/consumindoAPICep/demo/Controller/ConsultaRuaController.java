@@ -1,6 +1,6 @@
 package com.consumindoAPICep.demo.Controller;
 
-import com.consumindoAPICep.demo.dto.CepResultDTO;
+import com.consumindoAPICep.demo.Entity.CepResultDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;

@@ -21,6 +21,7 @@ public class CepService {
 
     @Cacheable(value = "buscaPorRua", key = "#uf + '-' + #localidade + '-' + #logradouro")
     public List<Cep> buscarCepPorRua(String uf, String localidade, String logradouro) {
+        System.out.println("🔍 Consultando API externa para a buscarCepPorRua: " + uf + localidade + logradouro);
         String url = UriComponentsBuilder
                 .fromHttpUrl("http://viacep.com.br/ws")
                 .pathSegment(uf, localidade, logradouro, "json")

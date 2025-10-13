@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CepService {
@@ -22,6 +23,7 @@ public class CepService {
     @Cacheable(value = "buscaPorRua", key = "#uf + '-' + #localidade + '-' + #logradouro")
     public List<Cep> buscarCepPorRua(String uf, String localidade, String logradouro) {
         System.out.println("🔍 Consultando API externa para a buscarCepPorRua: " + uf + localidade + logradouro);
+
         String url = UriComponentsBuilder
                 .fromHttpUrl("http://viacep.com.br/ws")
                 .pathSegment(uf, localidade, logradouro, "json")
@@ -29,53 +31,59 @@ public class CepService {
                 .toUriString();
 
         RestTemplate restTemplate = new RestTemplate();
-        // RestTemplate é uma classe do Spring usada para fazer requisições HTTP.
-
         ResponseEntity<Cep[]> response = restTemplate.getForEntity(url, Cep[].class);
-        //getForEntity() chama a API e espera uma resposta em formato de array de Cep.
-
 
         List<Cep> resultados = Arrays.asList(response.getBody());
-        // convertendo o array em lista e mostrando no corpo
 
-        // Salvar os resultados no banco se ainda não estiverem salvos
+        List<Cep> salvos = new ArrayList<>();
+
         for (Cep dto : resultados) {
-            if (!cepRepository.existsByCep(dto.getCep())) {
-                Cep cep = new Cep();
-                cep.setCep(dto.getCep());
-                cep.setLogradouro(dto.getLogradouro());
-                cep.setComplemento(dto.getComplemento());
-                cep.setBairro(dto.getBairro());
-                cep.setLocalidade(dto.getLocalidade());
-                cep.setUf(dto.getUf());
-                cep.setDdd(dto.getDdd());
+            Optional<Cep> existente = cepRepository.findByCep(dto.getCep());
 
-                cepRepository.save(cep);
+            if (existente.isPresent()) {
+                Cep cepExistente = existente.get();
+                cepExistente.setQtdPesquisas(cepExistente.getQtdPesquisas() + 1);
+                cepExistente = cepRepository.save(cepExistente);
+                salvos.add(cepExistente);
+            } else {
+                Cep novoCep = new Cep();
+                novoCep.setCep(dto.getCep());
+                novoCep.setLogradouro(dto.getLogradouro());
+                novoCep.setComplemento(dto.getComplemento());
+                novoCep.setBairro(dto.getBairro());
+                novoCep.setLocalidade(dto.getLocalidade());
+                novoCep.setUf(dto.getUf());
+                novoCep.setDdd(dto.getDdd());
+                novoCep.setQtdPesquisas(1); // primeira vez
 
-//                Percorre todos os resultados retornados pela API.
-//
-//                        Para cada resultado:
-//
-//                Verifica se o CEP já existe no banco.
-//
-//                Se não existe, cria um objeto Cep e copia os dados do CepResultDTO.
-//
-//                        Usa o cepRepository.save() para salvar no banco H2.
+                novoCep = cepRepository.save(novoCep);
+                salvos.add(novoCep);
             }
         }
 
-        return resultados;
+        return salvos;
     }
 
     @Cacheable(value = "ceps" , key = "#cep")
-    public Cep consultaInformPorCep(String cep){
+    public Cep consultaInformPorCep(String cep) {
         System.out.println("🔍 Consultando API externa para o CEP: " + cep);
 
-        RestTemplate restTemplate = new RestTemplate();
+        Optional<Cep> existente = cepRepository.findByCep(cep);
 
+        if (existente.isPresent()) {
+            Cep encontrado = existente.get();
+            encontrado.setQtdPesquisas(encontrado.getQtdPesquisas() + 1);
+            return cepRepository.save(encontrado);
+        }
+
+        // Se não tiver no banco, busca na API
+        RestTemplate restTemplate = new RestTemplate();
         String url = String.format("http://viacep.com.br/ws/%s/json", cep);
         ResponseEntity<Cep> response = restTemplate.getForEntity(url, Cep.class);
 
-        return response.getBody();
+        Cep novo = response.getBody();
+        novo.setQtdPesquisas(1); // primeira vez
+        return cepRepository.save(novo);
     }
+
 }

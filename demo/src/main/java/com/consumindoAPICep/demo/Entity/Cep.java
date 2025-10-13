@@ -28,6 +28,8 @@ public class Cep {
     private String uf;
     private String ddd;
 
+    private int qtdPesquisas = 0;
+
     // Getters e Setters
 
 }
